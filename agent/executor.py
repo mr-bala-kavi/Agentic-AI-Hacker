@@ -47,7 +47,7 @@ class Executor:
     def execute(self, test: TestCase, session_prefix: str = "sess") -> Observation:
         obs = Observation(test_id=test.id, channel=test.channel, timestamp=now_ts())
 
-        # MCP channel.
+        # MCP channel (tool calls, resource reads, enumeration).
         if test.channel == "mcp":
             url = self.target.mcp_url
             allowed, reason = self.supervisor.guard(url, test)
@@ -56,10 +56,21 @@ class Executor:
                 return obs
             try:
                 mcp = McpClient(url)
-                result = mcp.call_tool(test.payload, test.setup.get("arguments", {}))
-                obs.request = json.dumps({"tool": test.payload, "args": test.setup.get("arguments", {})})
+                op = test.setup.get("mcp_op", "call_tool")
+                args = test.setup.get("arguments", {})
+                if op == "read_resource":
+                    uri = test.setup.get("uri", test.payload)
+                    result = mcp.read_resource(uri)
+                    obs.request = json.dumps({"mcp_op": op, "uri": uri})
+                    obs.tool_calls = [{"resource": uri}]
+                elif op == "list_tools":
+                    result = {"tools": mcp.list_tools()}
+                    obs.request = json.dumps({"mcp_op": op})
+                else:  # call_tool
+                    result = mcp.call_tool(test.payload, args)
+                    obs.request = json.dumps({"mcp_op": op, "tool": test.payload, "args": args})
+                    obs.tool_calls = [{"name": test.payload, "arguments": args}]
                 obs.response = json.dumps(result)
-                obs.tool_calls = [{"name": test.payload, "arguments": test.setup.get("arguments", {})}]
                 obs.status_code = 200
             except Exception as exc:
                 obs.error = f"{type(exc).__name__}: {exc}"

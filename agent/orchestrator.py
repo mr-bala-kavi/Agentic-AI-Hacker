@@ -197,6 +197,13 @@ class Orchestrator:
             "Weak memory isolation lets one user read another user's data.",
             Severity.HIGH.value,
         )
+        chain_if(
+            ["mcp_security", "data_exposure"],
+            "MCP Tool Abuse -> Data Exposure",
+            "An unauthorized MCP tool/resource call surfaces restricted data that is "
+            "then exposed to the caller.",
+            Severity.CRITICAL.value,
+        )
 
     # -- run all ------------------------------------------------------------
     def run_full(self, max_iterations: Optional[int] = None) -> Dict:

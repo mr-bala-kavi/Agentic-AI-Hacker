@@ -30,11 +30,17 @@ class McpClient:
         return {"error": {"message": res.error or "non-json response", "raw": res.body[:400]}}
 
     def is_present(self) -> bool:
-        res = self.http.post_json(
-            self.endpoint,
-            {"jsonrpc": "2.0", "id": 0, "method": "initialize", "params": {}},
-        )
-        return res.status != 0 and not res.error
+        """Validate a real MCP surface via the initialize handshake.
+
+        A generic HTTP endpoint that merely returns 200 is NOT accepted; the
+        response must be a JSON-RPC result carrying MCP server metadata. This
+        avoids false-positives from chat endpoints that answer any POST.
+        """
+        data = self._rpc("initialize", {})
+        result = data.get("result", {}) if isinstance(data, dict) else {}
+        if not isinstance(result, dict):
+            return False
+        return any(k in result for k in ("serverInfo", "protocolVersion", "capabilities"))
 
     def list_tools(self) -> List[Dict[str, Any]]:
         data = self._rpc("tools/list")
@@ -48,3 +54,6 @@ class McpClient:
 
     def call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         return self._rpc("tools/call", {"name": name, "arguments": arguments})
+
+    def read_resource(self, uri: str) -> Dict[str, Any]:
+        return self._rpc("resources/read", {"uri": uri})

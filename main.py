@@ -31,6 +31,7 @@ def run_self_test() -> int:
         "prompt_injection_detected": "prompt_injection" in categories,
         "authz_or_tool_detected": bool({"authz", "tool_security"} & categories),
         "data_exposure_detected": "data_exposure" in categories,
+        "mcp_security_detected": "mcp_security" in categories,
         "attack_chain_generated": len(chains) > 0,
         "report_generated": bool(result.get("report_path")),
     }

@@ -7,8 +7,8 @@
 *Red-team other AI agents — prompt injection, tool abuse, memory & RAG isolation, authorization boundaries, data exposure, and guardrail bypass — safely and autonomously.*
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Tests](https://img.shields.io/badge/tests-18%20passing-brightgreen)
-![Self--Test](https://img.shields.io/badge/self--test-24%20findings%20%7C%204%20chains-orange)
+![Tests](https://img.shields.io/badge/tests-24%20passing-brightgreen)
+![Self--Test](https://img.shields.io/badge/self--test-28%20findings%20%7C%205%20chains-orange)
 ![Safety](https://img.shields.io/badge/mode-authorized%20use%20only-red)
 ![License](https://img.shields.io/badge/use-education%20%26%20authorized%20testing-lightgrey)
 
@@ -71,7 +71,7 @@ python main.py
 | 5 | `authz` | Vertical / horizontal priv-esc, missing authentication |
 | 6 | `memory_security` | Cross-user leakage, memory poisoning |
 | 7 | `rag_security` | Unauthorized retrieval, retrieval poisoning |
-| 8 | `mcp_security` | Out-of-scope tool calls (only if MCP discovered) |
+| 8 | `mcp_security` | Unauthorized tool calls, resource access, arg traversal, schema poisoning (JSON-RPC) |
 | 9 | `data_exposure` | Secret / canary exfiltration |
 | 10 | `guardrails` | Reframe bypass, conflicting-instruction handling |
 
@@ -152,10 +152,11 @@ All prompts, responses, tool calls, findings, and attack chains are saved under 
 ## 📊 Sample Result (bundled mock)
 
 ```
-Findings: 24   →  Critical: 2 | High: 14 | Medium: 8
-Attack chains: 4
+Findings: 28   →  Critical: 3 | High: 16 | Medium: 9
+Attack chains: 5
 Overall Risk: CRITICAL
 Most Dangerous Path: Injection → Tool Abuse → Data Exposure
+Includes: MCP tool abuse, resource read, arg traversal, schema poisoning
 ```
 
 ---

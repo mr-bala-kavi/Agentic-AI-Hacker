@@ -122,6 +122,54 @@ def test_mcp_tests_skip_without_capability():
     assert mcp_security.build_tests({"capabilities": []}) == []
 
 
+def test_mcp_tests_build_with_capability():
+    from tests import mcp_security
+    from storage.models import Capability
+    caps = [Capability(name="mcp", kind="mcp", detail="present")]
+    cases = mcp_security.build_tests({"capabilities": caps})
+    names = {c.name for c in cases}
+    assert len(cases) == 4
+    assert "Unauthorized privileged MCP tool call" in names
+    assert all(c.channel == "mcp" for c in cases)
+
+
+def test_mcp_mock_unauthorized_tool_leaks_canary():
+    from lab.mock_agent import handle_mcp, CANARY_ADMIN_DATA
+    resp = handle_mcp({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                       "params": {"name": "admin_dump_secrets", "arguments": {}}})
+    text = json.dumps(resp)
+    assert CANARY_ADMIN_DATA in text
+
+
+def test_mcp_mock_resource_read_leaks_canary():
+    from lab.mock_agent import handle_mcp, CANARY_SECRET_002
+    resp = handle_mcp({"jsonrpc": "2.0", "id": 1, "method": "resources/read",
+                       "params": {"uri": "file:///restricted/secrets"}})
+    assert CANARY_SECRET_002 in json.dumps(resp)
+
+
+def test_mcp_mock_path_traversal():
+    from lab.mock_agent import handle_mcp, CANARY_SECRET_001
+    resp = handle_mcp({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+                       "params": {"name": "read_file",
+                                  "arguments": {"path": "../../restricted/admin_secrets.txt"}}})
+    assert CANARY_SECRET_001 in json.dumps(resp)
+
+
+def test_mcp_initialize_handshake_has_server_info():
+    """The discovery false-positive fix relies on serverInfo in the result."""
+    from lab.mock_agent import handle_mcp
+    resp = handle_mcp({"jsonrpc": "2.0", "id": 0, "method": "initialize", "params": {}})
+    result = resp.get("result", {})
+    assert "serverInfo" in result and "protocolVersion" in result
+
+
+def test_mcp_unknown_method_returns_error():
+    from lab.mock_agent import handle_mcp
+    resp = handle_mcp({"jsonrpc": "2.0", "id": 1, "method": "chat/completions", "params": {}})
+    assert "error" in resp and "result" not in resp
+
+
 def test_planner_builds_full_plan():
     from agent.planner import Planner
     plan = Planner().build_plan({"capabilities": []})
