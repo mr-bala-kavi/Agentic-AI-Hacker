@@ -1,0 +1,11 @@
+{
+  "name": "External SupportBot (declared target)",
+  "base_url": "http://127.0.0.1:8770",
+  "chat_path": "/chat",
+  "auth_header": "X-Auth-Token",
+  "accounts": {
+    "user":  {"token": "user-token",  "user_id": "U"},
+    "admin": {"token": "admin-token", "user_id": "A"},
+    "anon":  {"token": "", "user_id": ""}
+  }
+}

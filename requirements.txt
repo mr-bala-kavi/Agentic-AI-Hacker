@@ -1,0 +1,11 @@
+# Core platform runs on the Python 3 standard library only.
+# The packages below are OPTIONAL and enhance functionality when installed.
+pydantic>=2.0        # richer data models (falls back to a shim if absent)
+requests>=2.28       # HTTP client (falls back to urllib if absent)
+# --- optional LLM providers (heuristic offline provider is the default) ---
+openai>=1.0          # only used if LLM_PROVIDER=openai and OPENAI_API_KEY set
+anthropic>=0.39      # only used if LLM_PROVIDER=anthropic and ANTHROPIC_API_KEY set
+# --- optional integrations ---
+playwright>=1.40     # only used for real browser-driven web-agent testing
+# --- dev/test ---
+pytest>=7.0

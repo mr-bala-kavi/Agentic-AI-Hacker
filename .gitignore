@@ -1,0 +1,66 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- Secrets / config ----
+.env
+*.key
+*.pem
+
+# ---- Databases ----
+*.db
+*.sqlite
+*.sqlite3
+agentic_hacker.db
+
+# ---- Runtime / generated artifacts ----
+logs/*.log
+evidence/*
+!evidence/.gitkeep
+reports/*.md
+prompts/*
+!prompts/.gitkeep
+
+# Generated assessment workspace (evidence per run)
+ai-agent-pentest/reconnaissance/*
+ai-agent-pentest/prompts/*
+ai-agent-pentest/responses/*
+ai-agent-pentest/tool_calls/*
+ai-agent-pentest/evidence/*
+ai-agent-pentest/findings/*
+ai-agent-pentest/attack_chains/*
+ai-agent-pentest/report/*
+!ai-agent-pentest/**/.gitkeep
+
+# Original build spec (input, not source)
+prompt.json
+
+# Private build/roadmap notes (kept local, not published)
+list.txt
+
+# ---- IDE / editor ----
+.vscode/
+.idea/
+*.swp
+*~
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
